@@ -36,6 +36,7 @@ model Place {
   address Json
   latitude  Float?
   longitude Float?
+  iconURL String
   type String
   rating Float
 }

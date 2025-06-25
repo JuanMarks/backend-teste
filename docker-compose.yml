@@ -1,12 +1,8 @@
-
-
 services:
   postgres:
     image: postgres
     container_name: postgres
-    environment:
-      POSTGRES_USER: amotur
-      POSTGRES_PASSWORD: amotur123
-      POSTGRES_DB: nestdb
     ports:
-      - '5432:5432'
+      - '5433:5432'
+    env_file:
+      - .env

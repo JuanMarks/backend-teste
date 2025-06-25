@@ -40,21 +40,31 @@ export class CreatePlaceDto {
   @IsNotEmpty({ message: 'O endereço é obrigatório.' })
   @IsString()
   address: Address;
+
   @ApiProperty({
     description: 'Latitude do local',
     example: -23.55052,
   })
   latitude: number;
+
   @ApiProperty({
     description: 'Longitude do local',
     example: -46.633308,
   })
   longitude: number;
+  
+  @ApiProperty({
+    description: 'URL do ícone do local',
+    example: 'https://example.com/icon.png',
+  })
+  @IsNotEmpty({ message: 'A URL do ícone é obrigatória.' })
+  @IsString()
+  iconURL: string;
+
   @ApiProperty({
     description: 'Tipo do local',
     example: 'Restaurante',
   })
-
   @IsNotEmpty({ message: 'O tipo é obrigatório.' })
   @IsString()
   type: string;
