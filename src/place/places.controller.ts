@@ -35,8 +35,8 @@ export class PlacesController {
     status: 500,
     description: 'Erro interno do servidor.',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('admin')
   createPlace(@Body() data: CreatePlaceDto) {
     return this.placesService.createPlace(data);
   }
@@ -159,8 +159,8 @@ export class PlacesController {
     status: 500,
     description: 'Erro interno do servidor.',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('admin')
   deletePlace(@Param('id') id: string) {
     return this.placesService.deletePlace(id);
   }

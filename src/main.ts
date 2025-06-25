@@ -8,6 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
+    app.enableCors({
+    origin:true, // endereço do seu frontend React
+    credentials: true,               // se quiser mandar cookies (opcional)
+  });
 
   const config = new DocumentBuilder()
     .setTitle('API Turismo')
