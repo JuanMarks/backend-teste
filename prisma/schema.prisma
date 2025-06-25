@@ -39,4 +39,5 @@ model Place {
   iconURL String
   type String
   rating Float
+  photos String[]
 }

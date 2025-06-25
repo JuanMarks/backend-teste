@@ -77,4 +77,16 @@ export class CreatePlaceDto {
   @Min(0)
   @Max(5)
   rating: number;
+
+  @ApiProperty({
+    description: 'Array de URLs de fotos do local',
+    example: [
+      'https://example.com/foto1.jpg',
+      'https://example.com/foto2.jpg',
+    ],
+    isArray: true,
+    type: String,
+  })
+  @IsNotEmpty({ message: 'As fotos são obrigatórias.' })
+  photos: string[];
 }
