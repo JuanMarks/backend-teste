@@ -38,7 +38,7 @@ export class CreatePlaceDto {
   })
 
   @IsNotEmpty({ message: 'O endereço é obrigatório.' })
-  @IsString()
+  
   address: Address;
 
   @ApiProperty({
