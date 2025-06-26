@@ -7,10 +7,18 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
-    app.enableCors({
-    origin:true, // endereço do seu frontend React
-    credentials: true,               // se quiser mandar cookies (opcional)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // Habilita a transformação automática de tipos
+      transformOptions: {
+        enableImplicitConversion: true, // Permite conversão implícita com base nos tipos do DTO
+      },
+    }),
+  );
+  
+  app.enableCors({
+    origin: true,
+    credentials: true,
   });
 
   const config = new DocumentBuilder()

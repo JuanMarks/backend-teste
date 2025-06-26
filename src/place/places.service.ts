@@ -2,13 +2,43 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Place, Prisma, User } from '@prisma/client';
 import { NotFoundError } from 'rxjs';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CreatePlaceDto } from './dto/create-place';
+
 @Injectable()
 export class PlacesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private cloudinary: CloudinaryService,) {}
 
-  async createPlace(data: Prisma.PlaceCreateInput): Promise<Place> {
-    return await this.prisma.place.create({
-      data,
+  async createPlace(
+    data: CreatePlaceDto,
+    photos: Express.Multer.File | Express.Multer.File[], // Aceita um ou vários arquivos
+  ): Promise<Place> {
+    const photoUrls: string[] = [];
+    const filesToUpload = Array.isArray(photos) ? photos : (photos ? [photos] : []); // Garante que seja sempre um array
+
+    for (const photo of filesToUpload) {
+      try {
+        const result = await this.cloudinary.uploadImage(photo);
+        if (result && result.secure_url) {
+          photoUrls.push(result.secure_url);
+        }
+      } catch (error) {
+        console.error('Erro ao fazer upload da imagem para o Cloudinary:', error);
+        // Você pode optar por lançar uma exceção aqui ou simplesmente pular o arquivo com erro
+      }
+    }
+
+    // Remove a propriedade 'photos' do DTO, pois vamos usar as URLs do Cloudinary
+    const { photos: dtoPhotos, ...placeDataWithoutPhotos } = data;
+
+    const placeData: Prisma.PlaceCreateInput = {
+      ...placeDataWithoutPhotos,
+      address: data.address ? JSON.parse(JSON.stringify(data.address)) : undefined,
+      photos: photoUrls, // Salva as URLs das fotos do Cloudinary
+    };
+
+    return this.prisma.place.create({
+      data: placeData,
     });
   }
 

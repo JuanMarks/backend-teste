@@ -1,19 +1,34 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Max, Min } from 'class-validator';
+// src/place/dto/create-place.ts
 
-type Address = {
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, Max, Min, ValidateNested, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer'; // 1. Importe o 'Type'
+
+// Crie uma classe para o endereço para que possamos validar seus campos
+export class AddressDto {
+  @ApiProperty({ example: 'Rua Joaquim Tomé' })
+  @IsString()
   logradouro: string;
+
+  @ApiProperty({ example: 123 })
+  @Type(() => Number) // 2. Transforme a string em número
+  @IsNumber()
   numero: number;
+
+  @ApiProperty({ example: 'Flores' })
+  @IsString()
   bairro: string;
+
+  @ApiProperty({ example: 'Ao lado do mercado central' })
+  @IsString()
   complemento: string;
-};
+}
 
 export class CreatePlaceDto {
   @ApiProperty({
     description: 'Nome do local',
     example: 'Real Lanche',
   })
-
   @IsNotEmpty({ message: 'O nome é obrigatório.' })
   @IsString()
   name: string;
@@ -22,35 +37,33 @@ export class CreatePlaceDto {
     description: 'Descrição do local',
     example: 'Melhor lanche da cidade',
   })
-
   @IsNotEmpty({ message: 'A descrição é obrigatória.' })
   @IsString()
   description: string;
 
   @ApiProperty({
     description: 'Endereço do local',
-    example: {
-      logradouro: 'Rua Joaquim Tomé',
-      numero: 123,
-      bairro: 'Flores',
-      complemento: 'Ao lado do mercado central',
-    },
+    type: AddressDto, // Use a classe AddressDto aqui
   })
-
   @IsNotEmpty({ message: 'O endereço é obrigatório.' })
-  
-  address: Address;
+  @ValidateNested()     // 3. Valide o objeto aninhado
+  @Type(() => AddressDto) // 4. Transforme o objeto aninhado
+  address: AddressDto;
 
   @ApiProperty({
     description: 'Latitude do local',
     example: -23.55052,
   })
+  @Type(() => Number) // 5. Transforme a string em número
+  @IsNumber()
   latitude: number;
 
   @ApiProperty({
     description: 'Longitude do local',
     example: -46.633308,
   })
+  @Type(() => Number) // 6. Transforme a string em número
+  @IsNumber()
   longitude: number;
   
   @ApiProperty({
@@ -68,12 +81,13 @@ export class CreatePlaceDto {
   @IsNotEmpty({ message: 'O tipo é obrigatório.' })
   @IsString()
   type: string;
+
   @ApiProperty({
     description: 'Avaliação do local',
     example: 4.5,
   })
-
   @IsNotEmpty({ message: 'A avaliação é obrigatória.' })
+  @Type(() => Number) // 7. Transforme a string em número
   @Min(0)
   @Max(5)
   rating: number;
@@ -86,7 +100,7 @@ export class CreatePlaceDto {
     ],
     isArray: true,
     type: String,
+    required: false // As fotos são enviadas separadamente, então o DTO não precisa delas
   })
-  @IsNotEmpty({ message: 'As fotos são obrigatórias.' })
-  photos: string[];
+  photos?: string[]; // Torne opcional, pois virá no corpo da requisição
 }

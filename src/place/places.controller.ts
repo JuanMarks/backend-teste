@@ -1,10 +1,11 @@
-import { Controller, Delete, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, UseGuards, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { PlacesService } from './places.service';
 import { Prisma } from '@prisma/client';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { CreatePlaceDto } from './dto/create-place';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiConsumes } from '@nestjs/swagger';
 import { UpdatePlaceDto } from './dto/update-place';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -14,6 +15,8 @@ export class PlacesController {
   constructor(private placesService: PlacesService) {}
 
   @Post('createPlace')
+  @UseInterceptors(FilesInterceptor('photos'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Criar um novo local',
     description:
@@ -37,8 +40,11 @@ export class PlacesController {
   })
   // @UseGuards(JwtAuthGuard, RolesGuard)
   // @Roles('admin')
-  createPlace(@Body() data: CreatePlaceDto) {
-    return this.placesService.createPlace(data);
+    createPlace(
+    @Body() createPlaceDto: CreatePlaceDto,
+    @UploadedFiles() photos: Array<Express.Multer.File>, // Recebe as fotos
+  ) {
+    return this.placesService.createPlace(createPlaceDto, photos);
   }
 
   //--------------------------------------------------------------------------------------------------------------------------//
@@ -132,7 +138,12 @@ export class PlacesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   updatePlace(@Param('id') id: string, @Body() data: UpdatePlaceDto) {
-    return this.placesService.updatePlace(id, data);
+    // Convert address to plain object if present
+    const updateData = {
+      ...data,
+      address: data.address ? { ...data.address } : undefined,
+    };
+    return this.placesService.updatePlace(id, updateData);
   }
 
   //--------------------------------------------------------------------------------------------------------------------------//
