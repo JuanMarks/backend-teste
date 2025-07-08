@@ -17,4 +17,14 @@ export class CloudinaryService {
       toStream(file.buffer).pipe(upload);
     });
   }
+
+    async deleteImageByUrl(url: string): Promise<any> {
+    // Extract public_id from the URL
+    const matches = url.match(/\/([^\/]+)\.[a-zA-Z]+$/);
+    if (!matches) {
+      throw new Error('Invalid Cloudinary URL');
+    }
+    const publicId = matches[1];
+    return v2.uploader.destroy(publicId);
+  }
 }

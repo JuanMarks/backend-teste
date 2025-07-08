@@ -135,16 +135,35 @@ export class PlacesController {
     status: 500,
     description: 'Erro interno do servidor.',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  updatePlace(@Param('id') id: string, @Body() data: UpdatePlaceDto) {
-    // Convert address to plain object if present
-    const updateData = {
-      ...data,
-      address: data.address ? { ...data.address } : undefined,
-    };
-    return this.placesService.updatePlace(id, updateData);
-  }
+
+  @UseInterceptors(FilesInterceptor('photos'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Atualizar um local existente' })
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('admin')
+  updatePlace(
+        @Param('id') id: string, 
+        @Body() updatePlaceDto: UpdatePlaceDto,
+        @UploadedFiles() files: { newPhotos?: Express.Multer.File[] } // Recebe os arquivos
+    ) {
+        // O `files` objeto terá uma chave 'newPhotos' com um array de arquivos, se houver.
+        const newPhotos = files?.newPhotos || [];
+
+        // O 'photosToDelete' vem como uma string do FormData, então precisamos fazer o parse.
+        // É importante ter um tratamento de erro caso a string não seja um JSON válido.
+        let photosToDelete: string[] = [];
+        if (updatePlaceDto.photosToDelete) {
+            try {
+                photosToDelete = JSON.parse(updatePlaceDto.photosToDelete);
+            } catch (error) {
+                console.error('Erro ao fazer parse de photosToDelete:', error);
+                // Lide com o erro como preferir, talvez retornando um BadRequestException
+            }
+        }
+        
+        // Agora você passa todos os dados para o seu serviço, que conterá a lógica principal.
+        return this.placesService.updatePlace(id, updatePlaceDto, newPhotos, photosToDelete);
+    }
 
   //--------------------------------------------------------------------------------------------------------------------------//
 

@@ -4,6 +4,7 @@ import { Place, Prisma, User } from '@prisma/client';
 import { NotFoundError } from 'rxjs';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CreatePlaceDto } from './dto/create-place';
+import { UpdatePlaceDto } from './dto/update-place';
 
 @Injectable()
 export class PlacesService {
@@ -62,16 +63,62 @@ export class PlacesService {
     return foundPlace;
   }
 
-  async updatePlace(id: string, data: Prisma.PlaceUpdateInput): Promise<Place> {
-    const existsPlace = await this.prisma.place.findUnique({
+async updatePlace(
+    id: string,
+    updatePlaceDto: UpdatePlaceDto,
+    newPhotos: Express.Multer.File[],
+    photosToDelete: string[],
+  ): Promise<Place> {
+
+    const existingPlace = await this.prisma.place.findUnique({
       where: { id },
     });
-    if (!existsPlace) {
+    if (!existingPlace) {
       throw new NotFoundException(`Lugar com ID ${id} não encontrado`);
     }
-    return await this.prisma.place.update({
+    
+    if (photosToDelete && photosToDelete.length > 0) {
+      await Promise.all(
+        photosToDelete.map(url => this.cloudinary.deleteImageByUrl(url).catch(err => console.error(`Falha ao deletar imagem ${url}:`, err)))
+      );
+    }
+    
+    const newPhotoUrls: string[] = [];
+    if (newPhotos && newPhotos.length > 0) {
+      for (const file of newPhotos) {
+        const result = await this.cloudinary.uploadImage(file);
+        newPhotoUrls.push(result.secure_url);
+      }
+    }
+
+    const currentPhotos = (existingPlace.photos as string[]).filter(url => !photosToDelete.includes(url));
+    const updatedPhotos = [...currentPhotos, ...newPhotoUrls];
+
+    // --- CORREÇÃO PRINCIPAL AQUI ---
+    // 1. Desestruturamos o DTO e separamos 'address' e 'photosToDelete'.
+    // A chave 'dtoPhotosToDelete' é criada apenas para descartar a propriedade, ela não é usada.
+    const { address, photosToDelete: dtoPhotosToDelete, ...restOfDto } = updatePlaceDto;
+    
+    // 2. Agora, o objeto 'restOfDto' NÃO contém mais a propriedade 'photosToDelete'.
+    const dataToUpdate: Prisma.PlaceUpdateInput = {
+      ...restOfDto, // Seguro para espalhar aqui
+      rating: Number(restOfDto.rating),
+      address: address ? {
+        update: {
+          logradouro: address.logradouro,
+          numero: address.numero,
+          bairro: address.bairro,
+          complemento: address.complemento,
+        }
+      } : undefined,
+      photos: updatedPhotos,
+    };
+    // --- FIM DA CORREÇÃO ---
+
+    return this.prisma.place.update({
       where: { id },
-      data,
+      data: dataToUpdate,
+      
     });
   }
 
