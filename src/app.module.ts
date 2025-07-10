@@ -5,14 +5,21 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PlacesModule } from './place/places.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CategoryModule } from './category/category.module';
+import { RatingsModule } from './ratings/ratings.module'; // Importe o novo módulo
 
 @Module({
-  
-  imports: [UserModule, AuthModule, PrismaModule, PlacesModule,
-    ConfigModule.forRoot({ // 2. Adicione a configuração aqui
+  imports: [
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    PlacesModule,
+    ConfigModule.forRoot({
       isGlobal: true,
     }),
     CloudinaryModule,
+    CategoryModule,
+    RatingsModule, // Adicione o módulo aqui
   ],
   controllers: [],
   providers: [],

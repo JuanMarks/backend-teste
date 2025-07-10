@@ -1,17 +1,16 @@
 // src/place/dto/create-place.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Max, Min, ValidateNested, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer'; // 1. Importe o 'Type'
+import { IsNotEmpty, IsString, ValidateNested, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
-// Crie uma classe para o endereço para que possamos validar seus campos
 export class AddressDto {
   @ApiProperty({ example: 'Rua Joaquim Tomé' })
   @IsString()
   logradouro: string;
 
   @ApiProperty({ example: 123 })
-  @Type(() => Number) // 2. Transforme a string em número
+  @Type(() => Number)
   @IsNumber()
   numero: number;
 
@@ -43,29 +42,31 @@ export class CreatePlaceDto {
 
   @ApiProperty({
     description: 'Endereço do local',
-    type: AddressDto, // Use a classe AddressDto aqui
+    type: AddressDto,
   })
   @IsNotEmpty({ message: 'O endereço é obrigatório.' })
-  @ValidateNested()     // 3. Valide o objeto aninhado
-  @Type(() => AddressDto) // 4. Transforme o objeto aninhado
+  @ValidateNested()
+  @Type(() => AddressDto)
   address: AddressDto;
 
   @ApiProperty({
     description: 'Latitude do local',
     example: -23.55052,
   })
-  @Type(() => Number) // 5. Transforme a string em número
+  @Type(() => Number)
   @IsNumber()
-  latitude: number;
+  @IsOptional()
+  latitude?: number;
 
   @ApiProperty({
     description: 'Longitude do local',
     example: -46.633308,
   })
-  @Type(() => Number) // 6. Transforme a string em número
+  @Type(() => Number)
   @IsNumber()
-  longitude: number;
-  
+  @IsOptional()
+  longitude?: number;
+
   @ApiProperty({
     description: 'URL do ícone do local',
     example: 'https://example.com/icon.png',
@@ -75,22 +76,14 @@ export class CreatePlaceDto {
   iconURL: string;
 
   @ApiProperty({
-    description: 'Tipo do local',
-    example: 'Restaurante',
+    description: 'ID da Categoria',
+    example: 'clx......',
   })
-  @IsNotEmpty({ message: 'O tipo é obrigatório.' })
+  @IsNotEmpty({ message: 'A categoria é obrigatória.' })
   @IsString()
-  type: string;
+  categoryId: string;
 
-  @ApiProperty({
-    description: 'Avaliação do local',
-    example: 4.5,
-  })
-  @IsNotEmpty({ message: 'A avaliação é obrigatória.' })
-  @Type(() => Number) // 7. Transforme a string em número
-  @Min(0)
-  @Max(5)
-  rating: number;
+
 
   @ApiProperty({
     description: 'Array de URLs de fotos do local',
@@ -100,7 +93,8 @@ export class CreatePlaceDto {
     ],
     isArray: true,
     type: String,
-    required: false // As fotos são enviadas separadamente, então o DTO não precisa delas
+    required: false
   })
-  photos?: string[]; // Torne opcional, pois virá no corpo da requisição
+  @IsOptional()
+  photos?: string[];
 }

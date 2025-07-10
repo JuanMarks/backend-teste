@@ -98,8 +98,8 @@ export class PlacesController {
     summary: 'Obter locais por tipo',
     description: 'Endpoint para obter locais filtrados por tipo.',
   })
-  getPlaceByType(@Param('type') type: string) {
-    return this.placesService.getPlaceByType(type.toLowerCase());
+  getPlaceByCategory(@Param('type') type: string) {
+    return this.placesService.getPlaceByCategory(type);
   }
 
   //--------------------------------------------------------------------------------------------------------------------------//
