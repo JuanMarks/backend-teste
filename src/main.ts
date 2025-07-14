@@ -17,7 +17,7 @@ async function bootstrap() {
   );
   
   app.enableCors({
-    origin: true,
+    origin: ['http://localhost:3000',], // Substitua pelos domínios permitidos
     credentials: true,
   });
 
