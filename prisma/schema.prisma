@@ -10,13 +10,29 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  phone     String
-  password  String
-  createdAt DateTime @default(now())
-  ratings   Rating[] // Adiciona a relação com as avaliações do usuário
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String
+  password    String
+  createdAt   DateTime @default(now())
+  ratings     Rating[]
+  suggestions Suggestion[] // Adicione esta linha
+}
+
+// --- NOVO MODELO DE SUGESTÃO ---
+model Suggestion {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  latitude    Float
+  longitude   Float
+  status      String   @default("PENDING") // Status: PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now())
+  
+  // Relacionamento com o usuário que sugeriu
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
 }
 
 model Admin {

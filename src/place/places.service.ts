@@ -47,9 +47,7 @@ export class PlacesService {
 
   async getAllPlaces(): Promise<Place[]> {
     const foundPlace = await this.prisma.place.findMany({ include: { category: true } });
-    if (!foundPlace || foundPlace.length === 0) {
-      throw new NotFoundException('Nenhum lugar encontrado');
-    }
+    
     return foundPlace;
   }
 

@@ -6,7 +6,8 @@ import { PlacesModule } from './place/places.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CategoryModule } from './category/category.module';
-import { RatingsModule } from './ratings/ratings.module'; // Importe o novo módulo
+import { RatingsModule } from './ratings/ratings.module';
+import { SuggestionsModule } from './suggestions/suggestions.module'; // 1. Importe o novo módulo
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { RatingsModule } from './ratings/ratings.module'; // Importe o novo mód
     }),
     CloudinaryModule,
     CategoryModule,
-    RatingsModule, // Adicione o módulo aqui
+    RatingsModule,
+    SuggestionsModule, // 2. Adicione o módulo aqui no array de imports
   ],
   controllers: [],
   providers: [],
