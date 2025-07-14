@@ -144,10 +144,10 @@ export class PlacesController {
   updatePlace(
         @Param('id') id: string, 
         @Body() updatePlaceDto: UpdatePlaceDto,
-        @UploadedFiles() files: { newPhotos?: Express.Multer.File[] } // Recebe os arquivos
+        @UploadedFiles() photos: Array<Express.Multer.File> // Recebe os arquivos
     ) {
         // O `files` objeto terá uma chave 'newPhotos' com um array de arquivos, se houver.
-        const newPhotos = files?.newPhotos || [];
+        
 
         // O 'photosToDelete' vem como uma string do FormData, então precisamos fazer o parse.
         // É importante ter um tratamento de erro caso a string não seja um JSON válido.
@@ -162,7 +162,7 @@ export class PlacesController {
         }
         
         // Agora você passa todos os dados para o seu serviço, que conterá a lógica principal.
-        return this.placesService.updatePlace(id, updatePlaceDto, newPhotos, photosToDelete);
+        return this.placesService.updatePlace(id, updatePlaceDto, photos, photosToDelete);
     }
 
   //--------------------------------------------------------------------------------------------------------------------------//
