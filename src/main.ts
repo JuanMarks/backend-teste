@@ -17,7 +17,7 @@ async function bootstrap() {
   );
   
   app.enableCors({
-    origin: ['http://localhost:3000',], // Substitua pelos domínios permitidos
+    origin: ['http://localhost:3000','https://mapa-praia-next.vercel.app'], // Substitua pelos domínios permitidos
     credentials: true,
   });
 
@@ -30,6 +30,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(3001, '0.0.0.0');
 }
 bootstrap();

@@ -32,4 +32,11 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'Campo obrigatório '})
     @MinLength(6, { message: 'A senha deve conter no mínimo 6 caracteres'})
     password: string
+
+    @ApiProperty({
+        example: 'https://example.com/profile.jpg',
+        description: 'URL da imagem de perfil do usuário'
+    })
+    @IsString()
+    profileImage?: string
 }
