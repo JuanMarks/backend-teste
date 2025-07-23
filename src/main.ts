@@ -17,9 +17,7 @@ async function bootstrap() {
   );
   
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://mapa-praia-next.vercel.app'], // Seus domínios permitidos
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // Métodos permitidos
-    allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
+    origin: ['http://localhost:3000',], // Substitua pelos domínios permitidos
     credentials: true,
   });
 
@@ -27,7 +25,14 @@ async function bootstrap() {
     .setTitle('API Turismo')
     .setDescription('Documentação da API de Turismo')
     .setVersion('1.0')
-    .build();
+    .addBearerAuth({
+      type: "http",
+      scheme: "bearer",
+      bearerFormat: "JWT",
+      name: "Authorization",
+      in: "header",
+    })
+    .build()
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

@@ -30,6 +30,7 @@ export class UserServices {
         email: data.email,
         phone: data.phone,
         password: hashedPassword,
+        profileImage: data.profileImage, // pode ser uma URL ou caminho local
       },
       select: {
         id: true,

@@ -56,6 +56,7 @@ model Place {
   category      Category? @relation(fields: [categoryId], references: [id])
   categoryId    String?
   ratings       Rating[]  // Adiciona a relação com as avaliações do local
+  createdAt     DateTime  @default(now())
 }
 
 model Category {
@@ -78,4 +79,11 @@ model Rating {
   placeId   String
 
   @@unique([userId, placeId]) // Garante que um usuário só pode avaliar um local uma vez
+}
+
+model Mare {
+  id       String   @id @default(cuid())
+  mes      String   // "01", "02", ..., "12"
+  dia      String   // "01", "02", ..., "31"
+  horarios Json     // lista de objetos { horas: string, altura: string }
 }

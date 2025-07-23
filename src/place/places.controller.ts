@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { CreatePlaceDto } from './dto/create-place';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { UpdatePlaceDto } from './dto/update-place';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -38,8 +38,9 @@ export class PlacesController {
     status: 500,
     description: 'Erro interno do servidor.',
   })
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
     createPlace(
     @Body() createPlaceDto: CreatePlaceDto,
     @UploadedFiles() photos: Array<Express.Multer.File>, // Recebe as fotos
@@ -139,8 +140,9 @@ export class PlacesController {
   @UseInterceptors(FilesInterceptor('photos'))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Atualizar um local existente' })
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
   updatePlace(
         @Param('id') id: string, 
         @Body() updatePlaceDto: UpdatePlaceDto,
@@ -189,8 +191,9 @@ export class PlacesController {
     status: 500,
     description: 'Erro interno do servidor.',
   })
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
   deletePlace(@Param('id') id: string) {
     return this.placesService.deletePlace(id);
   }

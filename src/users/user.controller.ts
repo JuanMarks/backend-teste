@@ -31,15 +31,15 @@ export class UserController {
 	}
 
 	@Get()
-	// @UseGuards(JwtAuthGuard, RolesGuard)
-	// @Roles('admin') // Apenas admins podem ver todos os usuários
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles('admin') // Apenas admins podem ver todos os usuários
 	@ApiOperation({ summary: 'Listar todos os usuários (apenas admin)' })
 	findAll() {
 		return this.userServices.findAll();
 	}
 
 	@Get('me')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Obter dados do usuário logado' })
 	findMe(@Req() req) {
 		// O req.user é populado pelo JwtAuthGuard com os dados do token
@@ -47,7 +47,7 @@ export class UserController {
 	}
 
 	@Get(':id')
-	// @UseGuards(JwtAuthGuard, RolesGuard)
+	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles('admin') // Apenas admins podem buscar um usuário por ID
 	@ApiOperation({ summary: 'Obter um usuário por ID (apenas admin)' })
 	findOne(@Param('id') id: string) {
@@ -55,7 +55,7 @@ export class UserController {
 	}
 
 	@Put('me')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('profileImage'))
 	@ApiConsumes('multipart/form-data')
 	@ApiOperation({ summary: 'Atualizar os dados do usuário logado' })
@@ -69,14 +69,14 @@ export class UserController {
 	}
 
 	@Patch('me/password')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Atualizar a senha do usuário logado' })
 	updatePassword(@Req() req, @Body() updatePasswordDto: UpdatePasswordDto) {
 		return this.userServices.updatePassword(req.user.userId, updatePasswordDto);
 	}
 
 	@Delete(':id')
-	// @UseGuards(JwtAuthGuard, RolesGuard)
+	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles('admin') // Apenas admins podem deletar outros usuários
 	@ApiOperation({ summary: 'Deletar um usuário por ID (apenas admin)' })
 	remove(@Param('id') id: string) {
