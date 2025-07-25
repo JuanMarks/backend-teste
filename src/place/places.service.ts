@@ -32,6 +32,7 @@ export class PlacesService {
     const placeData: Prisma.PlaceCreateInput = {
       ...placeDataWithoutPhotos,
       address: data.address ? JSON.parse(JSON.stringify(data.address)) : undefined,
+      socialLinks: data.socialLinks ? JSON.parse(JSON.stringify(data.socialLinks)) : undefined,
       photos: photoUrls,
       category: {
         connect: {
@@ -104,6 +105,15 @@ export class PlacesService {
           numero: address.numero,
           bairro: address.bairro,
           complemento: address.complemento,
+        }
+      } : undefined,
+      socialLinks: updatePlaceDto.socialLinks ? {
+        update: {
+          tripadvisor: updatePlaceDto.socialLinks.tripadvisor,
+          whatsapp: updatePlaceDto.socialLinks.whatsapp,
+          instagram: updatePlaceDto.socialLinks.instagram,
+          email: updatePlaceDto.socialLinks.email,
+          website: updatePlaceDto.socialLinks.website,
         }
       } : undefined,
       photos: updatedPhotos,

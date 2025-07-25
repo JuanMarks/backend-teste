@@ -23,6 +23,34 @@ export class AddressDto {
   complemento: string;
 }
 
+export class SocialLinksDto {
+  @ApiProperty({ example: 'https://tripadvisor.com/exemplo', required: false })
+  @IsOptional()
+  @IsString()
+  tripadvisor?: string;
+
+  @ApiProperty({ example: 'https://web.whatsapp.com/exemplo', required: false })
+  @IsOptional()
+  @IsString()
+  whatsapp?: string;
+
+  @ApiProperty({ example: 'https://instagram.com/exemplo', required: false })
+  @IsOptional()
+  @IsString()
+  instagram?: string;
+
+  @ApiProperty({ example: 'https://email.com/exemplo', required: false })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiProperty({ example: 'https://website.com/exemplo', required: false })
+  @IsOptional()
+  @IsString()
+  website?: string;
+}
+
+
 export class CreatePlaceDto {
   @ApiProperty({
     description: 'Nome do local',
@@ -48,6 +76,17 @@ export class CreatePlaceDto {
   @ValidateNested()
   @Type(() => AddressDto)
   address: AddressDto;
+
+  @ApiProperty({
+    description: 'Links sociais do local',
+    type: SocialLinksDto,
+    required: false,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SocialLinksDto)
+  socialLinks?: SocialLinksDto;
+
 
   @ApiProperty({
     description: 'Latitude do local',

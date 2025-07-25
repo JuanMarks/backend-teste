@@ -57,6 +57,7 @@ model Place {
   categoryId    String?
   ratings       Rating[]  // Adiciona a relação com as avaliações do local
   createdAt     DateTime  @default(now())
+  socialLinks   Json?    // Links sociais do local, como Instagram, Facebook, etc.
 }
 
 model Category {
