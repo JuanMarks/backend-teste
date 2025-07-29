@@ -3,11 +3,13 @@ import { AuthService } from './auth.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { LoginDto } from './dto/login.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { GoogleService } from './google-auth.service';
+import { GoogleLoginResponseDto } from './dto/login-response.dto';
 
 @ApiTags('Autenticação')
 @Controller('auth')
 export class AuthController {
-    constructor( private readonly authService: AuthService) {}
+    constructor( private readonly authService: AuthService, private googleService: GoogleService) {}
 
     @Post('register-admin')
     @ApiOperation({ summary: 'Registrar novo administrador' })
@@ -36,4 +38,13 @@ export class AuthController {
         return this.authService.login(dto)
     }
 
+    @Post('google')
+    @ApiBody({type: GoogleLoginResponseDto})
+    @ApiOperation({ summary: 'Login com o Google'})
+    @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
+    @ApiResponse({ status: 500, description: 'Erro interno no servidor' })
+    async loginWithGoogle(@Body() body: {idToken: string}){
+        const access_token = await this.googleService.verify(body.idToken)
+        return {access_token}
+    }
 }

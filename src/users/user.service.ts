@@ -56,6 +56,7 @@ export class UserServices {
         email: true,
         profileImage: true,
         createdAt: true,
+        googleId: true, // Inclui o Google ID se necessário
       },
     });
   }
@@ -71,6 +72,7 @@ export class UserServices {
         email: true,
         profileImage: true,
         createdAt: true,
+        googleId: true, // Inclui o Google ID se necessário
       },
     });
     if (!user) {
@@ -113,7 +115,7 @@ export class UserServices {
 
     const isPasswordMatching = await bcrypt.compare(
       updatePasswordDto.currentPassword,
-      user.password,
+      user.password ?? '',
     );
 
     if (!isPasswordMatching) {

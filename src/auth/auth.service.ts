@@ -4,14 +4,15 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-    constructor( private prisma: PrismaService, private jwtService: JwtService) {}
+    constructor(private prisma: PrismaService, private jwtService: JwtService) { }
 
     async registerAdmin(dto: CreateAdminDto) {
         const existingAdmin = await this.prisma.admin.findUnique({
-            where: {email: dto.email}
+            where: { email: dto.email }
         })
 
         if (existingAdmin) {
@@ -32,43 +33,82 @@ export class AuthService {
     async login(dto: LoginDto) {
         const { email, password } = dto
 
-        const admin = await this.prisma.admin.findUnique({where:{ email }})
+        const admin = await this.prisma.admin.findUnique({ where: { email } })
 
         if (admin) {
             const passwordCorrect = await bcrypt.compare(password, admin.password)
 
             if (!passwordCorrect) throw new UnauthorizedException('Credenciais inválidas!')
 
-                const playLoad = { sub: admin.id, role: 'admin'}
-                return {
-                    access_token: await this.jwtService.signAsync(playLoad),
-                    user: {
-                        id: admin.id,
-                        name: admin.name,
-                        email: admin.email,
-                        role: 'admin',
-                    },
+            const playLoad = { sub: admin.id, role: 'admin' }
+            return {
+                access_token: await this.jwtService.signAsync(playLoad),
+                user: {
+                    id: admin.id,
+                    name: admin.name,
+                    email: admin.email,
+                    role: 'admin',
+                },
             }
         }
-       const user = await this.prisma.user.findUnique({ where: { email } });
+        const user = await this.prisma.user.findUnique({ where: { email } });
 
-    if (user) {
-      const senhaOk = await bcrypt.compare(password, user.password);
-      if (!senhaOk) throw new UnauthorizedException('Credenciais inválidas');
+        if (!user) {
+            throw new UnauthorizedException('Credenciais inválidas');
+        }
 
-      const payload = { sub: user.id, role: 'user' };
+        if (!user.password) {
+            throw new UnauthorizedException('Usuário não possui senha definida (Logar com o Google)');
+        }
 
-      return {
-        access_token: await this.jwtService.signAsync(payload),
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: 'user',
-        },
-      };
+        const senhaOk = await bcrypt.compare(password, user.password);
+        if (!senhaOk) throw new UnauthorizedException('Credenciais inválidas');
+
+        if (user) {
+            const senhaOk = await bcrypt.compare(password, user.password);
+            if (!senhaOk) throw new UnauthorizedException('Credenciais inválidas');
+
+            const payload = { sub: user.id, role: 'user' };
+
+            return {
+                access_token: await this.jwtService.signAsync(payload),
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: 'user',
+                },
+            };
+        }
+
+        throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    throw new UnauthorizedException('Credenciais inválidas');
-  } 
+    async findOrCreateGoogleUser({ googleId, name, email }) {
+        let user = await this.prisma.user.findUnique({
+            where: {
+                googleId
+            }
+        })
+
+        if (!user) {
+            user = await this.prisma.user.create({
+                data: {
+                    email,
+                    name, 
+                    googleId
+                }
+            })
+        }
+
+        return user
+    }
+
+    signJwtForUser(user: User) {
+        const payload = {
+            sub: user.id,
+            email: user.email,
+        }
+        return this.jwtService.sign(payload)
+    }
 }
