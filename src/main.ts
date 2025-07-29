@@ -17,7 +17,7 @@ async function bootstrap() {
   );
   
   app.enableCors({
-    origin: ['http://localhost:3000','https://mapa-praia-next.vercel.app/'], // Substitua pelos domínios permitidos
+    origin: ['http://localhost:3000','https://mapa-praia-next.vercel.app'], // Substitua pelos domínios permitidos
     credentials: true,
   });
 
